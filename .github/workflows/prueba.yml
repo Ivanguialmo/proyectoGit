@@ -9,8 +9,8 @@ env:
 TOKEN: ${{ secrets.DEV_TOKEN }}
 run: |
 if ($env:TOKEN -eq $env:LOCAL_DEV_TOKEN) {
-Write-Host "Coinciden "
+Write-Host "Coinciden"
 } else {
-Write-Host "No coinciden "
-exit 0
+Write-Host "No coinciden"
+exit 1
 }
