@@ -8,11 +8,12 @@ jobs:
         env:
           TOKEN: ${{ secrets.DEV_TOKEN }}
         run: |
+          powershell -ExecutionPolicy Bypass -File .\tu-script.ps1
           Write-Host "Valor Nube: '$env:TOKEN'"
           Write-Host "Valor Local: '$env:LOCAL_DEV_TOKEN'"
           if ($env:TOKEN -eq $env:LOCAL_DEV_TOKEN) {
             Write-Host "Coinciden "
           } else {
             Write-Host "No coinciden "
-            exit 0
+            exit 1
           }
