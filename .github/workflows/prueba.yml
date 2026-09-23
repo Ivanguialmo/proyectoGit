@@ -7,10 +7,11 @@ steps:
 - name: Comparar secret con variable local
 env:
 TOKEN: ${{ secrets.DEV_TOKEN }}
+LOCAL_DEV_TOKEN: ${{ secrets.LOCAL_DEV_TOKEN}}
 run: |
 if ($env:TOKEN -eq $env:LOCAL_DEV_TOKEN) {
-Write-Host "Coinciden"
+Write-Host "Coinciden "
 } else {
-Write-Host "No coinciden"
+Write-Host "No coinciden "
 exit 1
 }
