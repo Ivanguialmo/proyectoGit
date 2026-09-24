@@ -1,1 +1,2 @@
 AppVersion-0
+Añadida feature: commit-6a5ccc11a56ead28793a9cee471f3ea50f8b8449
