@@ -1,0 +1,54 @@
+name: update-readme
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+    types: [closed] 
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Validar Tokens de Desarrollo
+        env:
+          DEV_TOKEN: ${{ secrets.DEV_TOKEN }}
+          LOCAL_DEV_TOKEN: ${{ secrets.LOCAL_DEV_TOKEN }}
+        run: |
+          if [ "$DEV_TOKEN" != "$LOCAL_DEV_TOKEN" ]; then
+            echo "❌ No coinciden."
+            exit 1
+          fi
+          echo "✅ Coinciden."
+
+      - name: Actualizar README.md
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+
+          if echo "$COMMIT_MSG" | grep -q "Merge branch"; then
+            BRANCH_NAME=$(echo "$COMMIT_MSG" | sed -E "s/.*Merge branch '([^']+)'.*/\1/")
+          else
+            BRANCH_NAME="commit-${{ github.sha }}"
+          fi
+          
+          echo "Feature detectada: $BRANCH_NAME"
+          
+          sed -i -e '$a\' README.md
+          
+          echo "Añadida feature: $BRANCH_NAME" >> README.md
+
+      - name: Confirmar y subir cambios
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "docs: actualizar historial de features [skip ci]"
+          git push origin develop

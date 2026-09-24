@@ -1,0 +1,70 @@
+name: validate-dev
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["update-readme"]
+    types:
+      - completed
+
+jobs:
+  update-version:
+    if: >
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true) ||
+      (github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch')
+    
+    runs-on: self-hosted 
+    permissions:
+      contents: write
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Validar Tokens de Producción
+        env:
+          PROD_TOKEN: ${{ secrets.PROD_TOKEN }}
+          LOCAL_PROD_TOKEN: ${{ secrets.LOCAL_PROD_TOKEN }}
+        run: |
+          if [ "$PROD_TOKEN" != "$LOCAL_PROD_TOKEN" ]; then
+            echo "❌ No coinciden."
+            exit 1
+          fi
+          echo "✅ Coinciden."
+
+      - name: Incrementar AppVersion en el README
+        run: |
+          AHORA=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          if grep -qE "AppVersion-[0-9]+" README.md; then
+            CURRENT_VERSION=$(grep -oE "AppVersion-[0-9]+" README.md | head -n 1 | cut -d'-' -f2)
+            NEW_VERSION=$((CURRENT_VERSION + 1))
+            
+            echo "Versión actual: AppVersion-$CURRENT_VERSION"
+            echo "Nueva versión: AppVersion-$NEW_VERSION"
+            
+            sed -i "s/AppVersion-$CURRENT_VERSION/AppVersion-$NEW_VERSION/g" README.md
+          else
+            echo "⚠️ No se encontró 'AppVersion-X' en el archivo. Inicializando..."
+            sed -i -e '$a\' README.md
+            echo "AppVersion-1" >> README.md
+          fi
+
+      - name: Confirmar y subir cambios
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "build: incrementar AppVersion [skip ci]"
+          git push origin main
