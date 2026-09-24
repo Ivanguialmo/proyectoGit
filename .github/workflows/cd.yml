@@ -21,7 +21,6 @@ jobs:
       - name: Validar Tokens de Desarrollo
         env:
           DEV_TOKEN: ${{ secrets.DEV_TOKEN }}
-          LOCAL_DEV_TOKEN: ${{ secrets.LOCAL_DEV_TOKEN }}
         run: |
           if [ "$DEV_TOKEN" != "$LOCAL_DEV_TOKEN" ]; then
             echo "❌ No coinciden."

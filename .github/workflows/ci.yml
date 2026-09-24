@@ -35,7 +35,6 @@ jobs:
       - name: Validar Tokens de Producción
         env:
           PROD_TOKEN: ${{ secrets.PROD_TOKEN }}
-          LOCAL_PROD_TOKEN: ${{ secrets.LOCAL_PROD_TOKEN }}
         run: |
           if [ "$PROD_TOKEN" != "$LOCAL_PROD_TOKEN" ]; then
             echo "❌ No coinciden."
