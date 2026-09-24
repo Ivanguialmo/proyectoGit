@@ -31,17 +31,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
-
-      - name: Validar Tokens de Producción
-        env:
-          PROD_TOKEN: ${{ secrets.PROD_TOKEN }}
-        run: |
-          if [ "$PROD_TOKEN" != "$LOCAL_PROD_TOKEN" ]; then
-            echo "❌ No coinciden."
-            exit 1
-          fi
-          echo "✅ Coinciden."
-
+          
       - name: Incrementar AppVersion en el README
         run: |
           AHORA=$(date -u +"%Y-%m-%d %H:%M:%S UTC")

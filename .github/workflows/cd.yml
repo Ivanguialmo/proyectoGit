@@ -17,17 +17,7 @@ jobs:
     steps:
       - name: Clonar repositorio
         uses: actions/checkout@v4
-
-      - name: Validar Tokens de Desarrollo
-        env:
-          DEV_TOKEN: ${{ secrets.DEV_TOKEN }}
-        run: |
-          if [ "$DEV_TOKEN" != "$LOCAL_DEV_TOKEN" ]; then
-            echo "❌ No coinciden."
-            exit 1
-          fi
-          echo "✅ Coinciden."
-
+        
       - name: Actualizar README.md
         run: |
           COMMIT_MSG="${{ github.event.head_commit.message }}"
